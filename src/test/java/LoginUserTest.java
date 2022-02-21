@@ -2,6 +2,7 @@ import io.restassured.response.ValidatableResponse;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import java.util.Map;
 
@@ -9,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 
 public class LoginUserTest {
 
-    UserClient userClient= new UserClient();
+    UserClient userClient = new UserClient();
     UserOperation userOperation = new UserOperation();
     String token;
 
@@ -22,6 +23,7 @@ public class LoginUserTest {
         }
     }
 
+    @DisplayName("Логин ранее зарегестрированного пользователя")
     @Test
     public void loginExistingUser() {
         Map<String, String> responseData = userOperation.registerUser();
@@ -32,13 +34,13 @@ public class LoginUserTest {
                 .build();
 
         ValidatableResponse response = userClient.loginUser(user);
+        token = response.extract().path("accessToken");
         response.assertThat().statusCode(200);
         boolean isLoginExistingUser = response.extract().path("success");
-        Assert.assertTrue("User is not login", isLoginExistingUser);
-
-        token = response.extract().path("accessToken");
+        assertEquals("User is not login", true, isLoginExistingUser);
     }
 
+    @DisplayName("Логин с неверным паролеем и email")
     @Test
     public void loginInvalidPassAndEmail() {
         User user = new UserBuilder()
@@ -49,7 +51,7 @@ public class LoginUserTest {
         ValidatableResponse response = userClient.loginUser(user);
         response.assertThat().statusCode(401);
         boolean isLoginExistingUser = response.extract().path("success");
-        Assert.assertFalse("User is not login", isLoginExistingUser);
+        assertEquals("User is not login", false, isLoginExistingUser);
 
         String errorMessage = response.extract().path("message");
         assertEquals("email or password are incorrect", errorMessage);

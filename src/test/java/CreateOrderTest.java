@@ -3,6 +3,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import java.util.Map;
 
@@ -28,27 +29,29 @@ public class CreateOrderTest {
         }
     }
 
+    @DisplayName("Создание заказа с ингредиентами без авторизации")
     @Test
     public void createOrderWithoutAuthorization() {
         Ingredients ingredients = new IngredientsBuilder().setRandomIngredient().build();
         ValidatableResponse response = ordersClient.createOrder(null, ingredients);
         response.assertThat().statusCode(200);
         boolean isOk = response.extract().path("success");
-        Assert.assertTrue("Order is not created", isOk);
+        assertEquals("Order is not created",true, isOk);
     }
 
+    @DisplayName("Создание заказа с ингредиентами и авторизацией")
     @Test
     public void createOrderWithAuthorization() {
         Ingredients ingredients = new IngredientsBuilder().setRandomIngredient().build();
         Map<String, String> responseData = userOperation.registerUser();
+        token = responseData.get("token");
         ValidatableResponse response = ordersClient.createOrder(responseData.get("token"), ingredients);
         response.assertThat().statusCode(200);
         boolean isOk = response.extract().path("success");
-        Assert.assertTrue("Order is not created", isOk);
-
-        token = responseData.get("token");
+        assertEquals("Order is not created", true, isOk);
     }
 
+    @DisplayName("Создание заказа без ингредиентов и авторизации")
     @Test
     public void createOrderWithoutIngredients() {
         ValidatableResponse response = ordersClient.createOrder(null, null);
@@ -60,6 +63,7 @@ public class CreateOrderTest {
         assertEquals("Ingredient ids must be provided", errorMessage);
     }
 
+    @DisplayName("Создание заказа с невалидным ингредиентом без авторизации")
     @Test
     public void createOrderWithoutInvalidIngredients() {
         Ingredients invalidIngredients = new IngredientsBuilder().setRandomInvalidIngredient().build();

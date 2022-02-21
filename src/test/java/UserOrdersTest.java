@@ -1,8 +1,8 @@
 import io.restassured.response.ValidatableResponse;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import java.util.Map;
 
@@ -29,25 +29,26 @@ public class UserOrdersTest {
         }
     }
 
+    @DisplayName("Создание заказа через авторизованного пользователя")
     @Test
     public void getOrdersUserWithAuthorization() {
         Map<String, String> responseData = userOperation.registerUser();
+        token = responseData.get("token");
         ValidatableResponse response = ordersClient.getUserOrder(responseData.get("token"));
         response.assertThat().statusCode(200);
 
-        boolean isGetUserOrders = response.extract().path("success");
-        Assert.assertTrue("User orders not received", isGetUserOrders);
-
-        token = responseData.get("token");
+        boolean actual = response.extract().path("success");
+        assertEquals("User orders not received", true, actual);
     }
 
+    @DisplayName("Создание заказа через пользователя без авторизации")
     @Test
     public void getOrdersUserWithoutAuthorization() {
         ValidatableResponse response = ordersClient.getUserOrder(null);
         response.assertThat().statusCode(401);
 
         boolean isGetUserOrders = response.extract().path("success");
-        Assert.assertFalse("User orders received", isGetUserOrders);
+        assertEquals("User orders received", false, isGetUserOrders);
 
         String errorMessage = response.extract().path("message");
         assertEquals("You should be authorised", errorMessage);

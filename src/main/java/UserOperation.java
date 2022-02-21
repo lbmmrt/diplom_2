@@ -1,5 +1,4 @@
 import io.restassured.response.ValidatableResponse;
-import org.junit.Assert;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,10 +14,6 @@ public class UserOperation {
                 .setRandomParams()
                 .build();
         ValidatableResponse response = userClient.registerUser(user);
-        response.assertThat().statusCode(200);
-        boolean isRegistered = response.extract().path("success");
-        Assert.assertTrue("User is not registered", isRegistered);
-
         Map<String, String> responseData = new HashMap<>();
         if (response != null) {
             responseData.put("email", user.getEmail());
@@ -26,6 +21,10 @@ public class UserOperation {
             responseData.put("password", user.getPassword());
             responseData.put("token", response.extract().path("accessToken"));
         }
+        response.assertThat().statusCode(200);
+        boolean isRegistered = response.extract().path("success");
+        assertEquals("User is not registered",true, isRegistered);
+
         return responseData;
     }
 
@@ -33,14 +32,14 @@ public class UserOperation {
         ValidatableResponse responseExistingUser = userClient.changingUserData(token, existingUser);
         responseExistingUser.assertThat().statusCode(200);
         boolean isUpdate = responseExistingUser.extract().path("success");
-        Assert.assertTrue("User data is not update", isUpdate);
+        assertEquals("User data is not update",true, isUpdate);
     }
 
     public void updateDataFail(User existingUser) {
         ValidatableResponse response = userClient.changingUserData(null, existingUser);
         response.assertThat().statusCode(401);
         boolean isUpdate = response.extract().path("success");
-        Assert.assertFalse("User authorised", isUpdate);
+        assertEquals("User authorised",false, isUpdate);
 
         String errorMessage = response.extract().path("message");
         assertEquals("You should be authorised", errorMessage);
