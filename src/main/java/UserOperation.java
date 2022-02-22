@@ -31,22 +31,4 @@ public class UserOperation {
 
         return responseData;
     }
-
-//    @Step("Обновление информации о пользователе")
-//    public void updateUserData(String token, User existingUser) {
-//        ValidatableResponse responseExistingUser = userClient.changingUserData(token, existingUser);
-//        responseExistingUser.assertThat().statusCode(200);
-//        boolean isUpdate = responseExistingUser.extract().path("success");
-//        assertEquals("User data is not update",true, isUpdate);
-//    }
-//
-//    public void updateDataFail(User existingUser) {
-//        ValidatableResponse response = userClient.changingUserData(null, existingUser);
-//        response.assertThat().statusCode(401);
-//        boolean isUpdate = response.extract().path("success");
-//        assertEquals("User authorised",false, isUpdate);
-//
-//        String errorMessage = response.extract().path("message");
-//        assertEquals("You should be authorised", errorMessage);
-//    }
 }
