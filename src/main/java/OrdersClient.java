@@ -8,7 +8,7 @@ public class OrdersClient extends RestAssuredClient{
 
     private final static String ORDERS_PATH = "/api/orders";
 
-    @Step("create order")
+    @Step("Создать заказ")
     public ValidatableResponse createOrder(String token, Ingredients ingredients) {
         RequestSpecification request = given()
                 .spec(getBaseSpec());
@@ -24,21 +24,19 @@ public class OrdersClient extends RestAssuredClient{
         return request
                 .when()
                 .post(ORDERS_PATH)
-                .then()
-                .log().all();
+                .then();
     }
 
-    @Step("get all orders")
+    @Step("Получить все заказы")
     public ValidatableResponse getAllOrders() {
         return given()
                 .spec(getBaseSpec())
                 .when()
                 .get(ORDERS_PATH +"/all")
-                .then()
-                .log().all();
+                .then();
     }
 
-    @Step("get user order")
+    @Step("Получить заказы конкретного пользователя")
     public ValidatableResponse getUserOrder(String token) {
         RequestSpecification request = given()
                 .spec(getBaseSpec());
@@ -49,7 +47,6 @@ public class OrdersClient extends RestAssuredClient{
         return request
                 .when()
                 .get(ORDERS_PATH)
-                .then()
-                .log().all();
+                .then();
     }
 }

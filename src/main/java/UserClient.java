@@ -8,40 +8,37 @@ public class UserClient extends RestAssuredClient {
 
     private final static String USER_PATH = "/api";
 
-    @Step("register user")
+    @Step("Регистрация пользователя")
     public ValidatableResponse registerUser(User user) {
         return given()
                 .spec(getBaseSpec())
                 .body(user)
                 .when()
                 .post(USER_PATH + "/auth/register")
-                .then()
-                .log().all();
+                .then();
     }
 
-    @Step("delete user")
+    @Step("Удаление пользователя")
     public ValidatableResponse deleteUser(String token) {
         return given()
                 .spec(getBaseSpec())
                 .auth().oauth2(token.substring(7))
                 .when()
                 .delete(USER_PATH +"/auth/user")
-                .then()
-                .log().all();
+                .then();
     }
 
-    @Step("login user")
+    @Step("Логин пользователя")
     public ValidatableResponse loginUser(User user) {
         return given()
                 .spec(getBaseSpec())
                 .body(user)
                 .when()
                 .post(USER_PATH +"/auth/login")
-                .then()
-                .log().all();
+                .then();
     }
 
-    @Step("changing user data")
+    @Step("Обновление информации о пользователе")
     public ValidatableResponse changingUserData(String token, User user) {
         RequestSpecification request = given()
                 .spec(getBaseSpec());
@@ -53,29 +50,26 @@ public class UserClient extends RestAssuredClient {
                 .body(user)
                 .when()
                 .patch(USER_PATH +"/auth/user")
-                .then()
-                .log().all();
+                .then();
     }
 
-    @Step("password reset")
+    @Step("Сброс пароля")
     public ValidatableResponse passwordReset(User user) {
         return given()
                 .spec(getBaseSpec())
                 .body(user)
                 .when()
                 .post(USER_PATH + "/api/password-reset")
-                .then()
-                .log().all();
+                .then();
     }
 
-    @Step("update token")
+    @Step("Обновление токена")
     public ValidatableResponse updateToken(User user) {
         return given()
                 .spec(getBaseSpec())
                 .body(user)
                 .when()
                 .post(USER_PATH + "/auth/token")
-                .then()
-                .log().all();
+                .then();
     }
 }

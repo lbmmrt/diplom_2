@@ -7,13 +7,12 @@ public class IngredientsClient extends RestAssuredClient {
 
     private final static String COURIER_PATH = "/api/ingredients";
 
-    @Step("get all ingredients")
+    @Step("Получить все ингредиенты")
     public ValidatableResponse getAllIngredients() {
         return given()
                 .spec(getBaseSpec())
                 .when()
                 .get(COURIER_PATH)
-                .then()
-                .log().all();
+                .then();
     }
 }

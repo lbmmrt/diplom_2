@@ -1,12 +1,13 @@
 import io.restassured.response.ValidatableResponse;
+import org.junit.Test;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
-import org.junit.jupiter.api.DisplayName;
+
+import io.qameta.allure.junit4.DisplayName;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
 
 public class UserOrdersTest {
 
@@ -34,6 +35,7 @@ public class UserOrdersTest {
     public void getOrdersUserWithAuthorization() {
         Map<String, String> responseData = userOperation.registerUser();
         token = responseData.get("token");
+
         ValidatableResponse response = ordersClient.getUserOrder(responseData.get("token"));
         response.assertThat().statusCode(200);
 

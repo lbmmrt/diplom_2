@@ -1,12 +1,12 @@
 import io.restassured.response.ValidatableResponse;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.DisplayName;
+import org.junit.After;
+import org.junit.Before;
+
+import io.qameta.allure.junit4.DisplayName;
 
 import java.util.Map;
-
 import static org.junit.Assert.assertEquals;
 
 public class CreateOrderTest {
@@ -36,7 +36,7 @@ public class CreateOrderTest {
         ValidatableResponse response = ordersClient.createOrder(null, ingredients);
         response.assertThat().statusCode(200);
         boolean isOk = response.extract().path("success");
-        assertEquals("Order is not created",true, isOk);
+        assertEquals("Order is not created", true, isOk);
     }
 
     @DisplayName("Создание заказа с ингредиентами и авторизацией")
@@ -45,8 +45,10 @@ public class CreateOrderTest {
         Ingredients ingredients = new IngredientsBuilder().setRandomIngredient().build();
         Map<String, String> responseData = userOperation.registerUser();
         token = responseData.get("token");
+
         ValidatableResponse response = ordersClient.createOrder(responseData.get("token"), ingredients);
         response.assertThat().statusCode(200);
+
         boolean isOk = response.extract().path("success");
         assertEquals("Order is not created", true, isOk);
     }
@@ -56,6 +58,7 @@ public class CreateOrderTest {
     public void createOrderWithoutIngredients() {
         ValidatableResponse response = ordersClient.createOrder(null, null);
         response.assertThat().statusCode(400);
+
         boolean isOk = response.extract().path("success");
         Assert.assertFalse("Order is created", isOk);
 

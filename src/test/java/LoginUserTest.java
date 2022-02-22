@@ -1,8 +1,8 @@
 import io.restassured.response.ValidatableResponse;
-import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
-import org.junit.jupiter.api.DisplayName;
+import org.junit.After;
+
+import io.qameta.allure.junit4.DisplayName;
 
 import java.util.Map;
 
@@ -36,6 +36,7 @@ public class LoginUserTest {
         ValidatableResponse response = userClient.loginUser(user);
         token = response.extract().path("accessToken");
         response.assertThat().statusCode(200);
+
         boolean isLoginExistingUser = response.extract().path("success");
         assertEquals("User is not login", true, isLoginExistingUser);
     }
@@ -50,6 +51,7 @@ public class LoginUserTest {
 
         ValidatableResponse response = userClient.loginUser(user);
         response.assertThat().statusCode(401);
+
         boolean isLoginExistingUser = response.extract().path("success");
         assertEquals("User is not login", false, isLoginExistingUser);
 
