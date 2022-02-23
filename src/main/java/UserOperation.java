@@ -11,9 +11,8 @@ public class UserOperation {
 
     UserClient userClient = new UserClient();
 
-
     @Step("Регистрация нового пользователя")
-    public Map<String, String> registerUser() {
+    public Map<String, String> registerUserAndGetData() {
         User user = new UserBuilder()
                 .setRandomParams()
                 .build();

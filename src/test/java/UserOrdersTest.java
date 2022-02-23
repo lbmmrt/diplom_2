@@ -33,7 +33,7 @@ public class UserOrdersTest {
     @DisplayName("Создание заказа через авторизованного пользователя")
     @Test
     public void getOrdersUserWithAuthorization() {
-        Map<String, String> responseData = userOperation.registerUser();
+        Map<String, String> responseData = userOperation.registerUserAndGetData();
         token = responseData.get("token");
 
         ValidatableResponse response = ordersClient.getUserOrder(responseData.get("token"));

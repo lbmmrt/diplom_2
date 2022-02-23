@@ -1,18 +1,14 @@
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
-import org.junit.Test;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 
-import io.qameta.allure.junit4.DisplayName;
-
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.equalTo;
 
 public class RegisterUserTest {
 
     private UserClient userClient;
-    UserOperation userOperation = new UserOperation();
     private String token;
 
     @Before
@@ -31,31 +27,37 @@ public class RegisterUserTest {
     @DisplayName("Создание уникального пользователя")
     @Test
     public void registerUser() {
-        Map<String, String> responseData = userOperation.registerUser();
-        token = responseData.get("token");
-        String statusCode = responseData.get("statusCode");
-        String isRegistered = responseData.get("success");
-        assertEquals(statusCode, "200");
-        assertEquals("User is not registered", UserOperation.RESPONSE_SUCCESS_TRUE, isRegistered);
+        User user = new UserBuilder()
+                .setRandomParams()
+                .build();
+
+        ValidatableResponse response = userClient.registerUser(user);
+        token = response.extract().path("accessToken");
+        response.assertThat().body("success", equalTo(true))
+                .and()
+                .statusCode(200);
     }
 
     @DisplayName("Создание пользователя, который уже зарегистрирован")
     @Test
     public void registeringAnExistingUser() {
-        Map<String, String> responseData = userOperation.registerUser();
-        token = responseData.get("token");
+        User user = new UserBuilder()
+                .setRandomParams()
+                .build();
+        ValidatableResponse response = userClient.registerUser(user);
+        token = response.extract().path("accessToken");
 
         User existingUser = new UserBuilder()
-                .setEmail(responseData.get("email"))
-                .setPassword(responseData.get("password"))
-                .setName(responseData.get("name"))
+                .setEmail(user.getEmail())
+                .setPassword(user.getPassword())
+                .setName(user.getName())
                 .build();
+
         ValidatableResponse responseExistingUser = userClient.registerUser(existingUser);
-        responseExistingUser.assertThat().statusCode(403);
-        boolean isRegisteredExistingUser = responseExistingUser.extract().path("success");
-        assertEquals("User is registered", false, isRegisteredExistingUser);
-        String errorMessage = responseExistingUser.extract().path("message");
-        assertEquals("User already exists", errorMessage);
+        responseExistingUser.assertThat().assertThat().body("success", equalTo(false))
+                .and().body("message", equalTo("User already exists"))
+                .and()
+                .statusCode(403);
     }
 
     @DisplayName("Создание пользователя без заполнения имени")
@@ -65,13 +67,11 @@ public class RegisterUserTest {
                 .setRandomEmail()
                 .setRandomPassword()
                 .build();
+
         ValidatableResponse response = userClient.registerUser(newUser);
-        response.assertThat().statusCode(403);
-
-        boolean isRegistered = response.extract().path("success");
-        assertEquals("User is registered", false, isRegistered);
-
-        String errorMessage = response.extract().path("message");
-        assertEquals("Email, password and name are required fields", errorMessage);
+        response.assertThat().assertThat().body("success", equalTo(false))
+                .and().body("message", equalTo("Email, password and name are required fields"))
+                .and()
+                .statusCode(403);
     }
 }

@@ -1,13 +1,12 @@
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
-import org.junit.Assert;
-import org.junit.Test;
 import org.junit.After;
 import org.junit.Before;
-
-import io.qameta.allure.junit4.DisplayName;
+import org.junit.Test;
 
 import java.util.Map;
-import static org.junit.Assert.assertEquals;
+
+import static org.hamcrest.Matchers.equalTo;
 
 public class CreateOrderTest {
 
@@ -34,36 +33,32 @@ public class CreateOrderTest {
     public void createOrderWithoutAuthorization() {
         Ingredients ingredients = new IngredientsBuilder().setRandomIngredient().build();
         ValidatableResponse response = ordersClient.createOrder(null, ingredients);
-        response.assertThat().statusCode(200);
-        boolean isOk = response.extract().path("success");
-        assertEquals("Order is not created", true, isOk);
+        response.assertThat().body("success", equalTo(true))
+                .and()
+                .statusCode(200);
     }
 
     @DisplayName("Создание заказа с ингредиентами и авторизацией")
     @Test
     public void createOrderWithAuthorization() {
         Ingredients ingredients = new IngredientsBuilder().setRandomIngredient().build();
-        Map<String, String> responseData = userOperation.registerUser();
+        Map<String, String> responseData = userOperation.registerUserAndGetData();
         token = responseData.get("token");
 
         ValidatableResponse response = ordersClient.createOrder(responseData.get("token"), ingredients);
-        response.assertThat().statusCode(200);
-
-        boolean isOk = response.extract().path("success");
-        assertEquals("Order is not created", true, isOk);
+        response.assertThat().body("success", equalTo(true))
+                .and()
+                .statusCode(200);
     }
 
     @DisplayName("Создание заказа без ингредиентов и авторизации")
     @Test
     public void createOrderWithoutIngredients() {
         ValidatableResponse response = ordersClient.createOrder(null, null);
-        response.assertThat().statusCode(400);
-
-        boolean isOk = response.extract().path("success");
-        Assert.assertFalse("Order is created", isOk);
-
-        String errorMessage = response.extract().path("message");
-        assertEquals("Ingredient ids must be provided", errorMessage);
+        response.assertThat().assertThat().body("success", equalTo(false))
+                .and().body("message", equalTo("Ingredient ids must be provided"))
+                .and()
+                .statusCode(400);
     }
 
     @DisplayName("Создание заказа с невалидным ингредиентом без авторизации")

@@ -1,12 +1,11 @@
-import io.restassured.response.ValidatableResponse;
-import org.junit.Test;
-import org.junit.After;
-
 import io.qameta.allure.junit4.DisplayName;
+import io.restassured.response.ValidatableResponse;
+import org.junit.After;
+import org.junit.Test;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.equalTo;
 
 public class LoginUserTest {
 
@@ -26,7 +25,7 @@ public class LoginUserTest {
     @DisplayName("Логин ранее зарегестрированного пользователя")
     @Test
     public void loginExistingUser() {
-        Map<String, String> responseData = userOperation.registerUser();
+        Map<String, String> responseData = userOperation.registerUserAndGetData();
 
         User user = new UserBuilder()
                 .setEmail(responseData.get("email"))
@@ -35,10 +34,9 @@ public class LoginUserTest {
 
         ValidatableResponse response = userClient.loginUser(user);
         token = response.extract().path("accessToken");
-        response.assertThat().statusCode(200);
-
-        boolean isLoginExistingUser = response.extract().path("success");
-        assertEquals("User is not login", true, isLoginExistingUser);
+        response.assertThat().body("success", equalTo(true))
+                .and()
+                .statusCode(200);
     }
 
     @DisplayName("Логин с неверным паролеем и email")
@@ -50,12 +48,9 @@ public class LoginUserTest {
                 .build();
 
         ValidatableResponse response = userClient.loginUser(user);
-        response.assertThat().statusCode(401);
-
-        boolean isLoginExistingUser = response.extract().path("success");
-        assertEquals("User is not login", false, isLoginExistingUser);
-
-        String errorMessage = response.extract().path("message");
-        assertEquals("email or password are incorrect", errorMessage);
+        response.assertThat().assertThat().body("success", equalTo(false))
+                .and().body("message", equalTo("email or password are incorrect"))
+                .and()
+                .statusCode(401);
     }
 }
